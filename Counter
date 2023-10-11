@@ -1,0 +1,19 @@
+int counter,num;
+    counter =1;
+    printf("Input your number : ");
+    scanf("%d",&num);
+
+    for(counter =1; counter<=num;counter++){
+        if(counter%2) printf("%d\n",counter);
+
+    }
+
+    puts("Second loop");
+    counter=1;
+
+    for(counter =1; counter<=num;counter++){
+        if(counter%5==0) printf("%d\n",counter);
+
+    }
+
+    printf("The last value is %d",counter);
