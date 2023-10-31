@@ -1,0 +1,23 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+void trigo(int,int);
+void main()
+{
+        int x,y;
+        printf("Input the values a b : ");
+        scanf("%d %d",&x,&y);
+        trigo(x,y);
+
+}
+
+void trigo(int x, int y)
+{
+    int i,r;
+    i=x*x+y*y;
+
+    r=sqrt(i);
+    printf("The values of the c is %d",r);
+}
+
+
