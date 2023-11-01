@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define Size 3
+
+int main()
+{
+    int i;
+    int x[Size];
+    for(i=0;i<Size;i++){
+        printf("Input number in [%d]",i+1,Size);
+        scanf("%d",&x[i]);
+    }
+
+    for(i=0;i<Size;i++)
+        printf("%5d",x[i]);
+    puts("");
+
+    int max=x[0],min=x[0];
+
+    for(i=1;i<Size;i++){
+    if(max<x[i]) max=x[i];
+    if(min>x[i]) min=x[i];
+    }
+
+    printf("The maximum number is %d\n",max);
+    printf("The minimum number is %d\n",min);
+}
