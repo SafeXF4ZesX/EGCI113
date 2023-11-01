@@ -1,0 +1,25 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define Size 3
+
+int main()
+{
+    int i;
+    int x[Size];
+    for(i=0;i<Size;i++){
+        printf("Input number in [%d]",i+1,Size);
+        scanf("%d",&x[i]);
+    }
+
+    for(i=0;i<Size;i++)
+        printf("%3d",x[i]);
+    puts("");
+
+    int big=x[0];
+
+    for(i=1;i<Size;i++){
+    if(big<x[i]) big=x[i];
+    }
+
+    printf("The biggest number is %d\n",big);
+}
