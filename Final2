@@ -1,0 +1,256 @@
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <time.h>
+
+  // Struct for player's money
+  typedef struct {
+    int balance;
+    int bid;
+  } PlayerMoney;
+
+
+  // Function Prototypes
+  // Random Number System //
+  int randomNumber(int min, int max);
+
+  // Show Card and Value system //
+  void showCard(int randomCard, char *cardType, int *cardValue, int *isAce);
+
+  // Game Logic //
+  void gameLogic(int totalValue, int totalDealerValue, PlayerMoney *playerMoney);
+
+  // Ace Handling //
+  int calculateBestHand(int totalValue, int aceCount);
+
+  // Dealer Logic //
+  void dealerLogic(int totalValue, int totalDealerValue, PlayerMoney *playerMoney,
+                   int dealerCard3, int dealerCard4, char *dealerType1,
+                   char *dealerType2, char *dealerType3, char *dealerType4,
+                   int dealerValue1, int dealerValue2, int *dealerValue3,
+                   int *dealerValue4, int *dealerAceCount);
+
+  int main() {
+    printf("DISCLAIMER : DO NOT GAMBLE IF YOU DO NOT KNOW WHAT YOU ARE DOING\n");
+    printf("Oops, I meant\n");
+    printf("***********************\n");
+
+    // Initialize player's money
+    PlayerMoney playerMoney;
+    playerMoney.balance = 1000; // Starting balance
+
+    // Options //
+    int option;
+    // Choices //
+    int choice;
+    // Player busted check//
+    int playerBusted;
+
+    // Declare variables for player //
+    char cardType1[20], cardType2[20], cardType3[20], cardType4[20],
+        cardType5[20], cardType6[20];
+    int cardValue1, cardValue2, cardValue3, cardValue4, cardValue5, cardValue6;
+    int playerAceCount = 0;
+    // Declare variables for dealer //
+    char dealerType1[20], dealerType2[20], dealerType3[20], dealerType4[20],
+        dealerType5[20];
+    int dealerValue1, dealerValue2, dealerValue3, dealerValue4, dealerValue5;
+    int totalDealerValue;
+    int dealerAceCount = 0;
+    // Define value //
+    int totalValue;
+
+  restart_game:
+    playerBusted = 0;
+    // Random Number Generator //
+    srand(time(NULL));
+
+    // Random Generate Cards //
+    int randomCard1 = randomNumber(1, 13);
+    int randomCard2 = randomNumber(1, 13);
+    int randomCard3 = randomNumber(1, 13);
+    int randomCard4 = randomNumber(1, 13);
+    int randomCard5 = randomNumber(1, 13);
+    int randomCard6 = randomNumber(1, 13);
+
+    int dealerCard1 = randomNumber(1, 13);
+    int dealerCard2 = randomNumber(1, 13);
+    int dealerCard3 = randomNumber(1, 13);
+    int dealerCard4 = randomNumber(1, 13);
+    int dealerCard5 = randomNumber(1, 13);
+    int dealerCard6 = randomNumber(1, 13);
+
+    while (1) {
+      printf("Welcome to Blackjack\n");
+      printf("1.Sit 2.Leave\n");
+      printf("Input your option : "); // Select the option
+      scanf("%d", &option);           // Scan for the options
+
+      if (option == 2) { // Option 2
+        printf("***********************\n");
+        printf("GET OUT! >:(\n");
+        return 0; // Exit the loop and end the program
+      }
+
+      if (option == 1) { // Option 1 (Sit)
+        printf("***********************\n");
+        printf("You sat at the table\n");
+        printf("Dealing...\n");
+        printf("***********************\n");
+
+        // Draw the first card dealer //
+        showCard(dealerCard1, dealerType1, &dealerValue1, &dealerAceCount);
+        printf("Dealer's Hand (First Card) : %s(%d)\n", dealerType1,
+               dealerValue1);
+
+        // Draw the first card player
+        showCard(randomCard1, cardType1, &cardValue1, &playerAceCount);
+        printf("Player's Hand (First Card): %s(%d)\n", cardType1, cardValue1);
+
+        // Draw the second card dealer
+        showCard(dealerCard2, dealerType2, &dealerValue2, &dealerAceCount);
+        printf("Dealer's Hand (Second Card) : Hidden\n");
+
+        // Draw the second card player
+        showCard(randomCard2, cardType2, &cardValue2, &playerAceCount);
+        printf("Player's Hand (Second Card): %s(%d)\n", cardType2, cardValue2);
+
+        // Calculate the sum of the cards player
+        totalValue = calculateBestHand(cardValue1 + cardValue2, playerAceCount);
+        printf("***********************\n");
+        printf("Player's Hand : %s,%s (%d)\n", cardType1, cardType2, totalValue);
+
+        // Calculate the sum of the cards dealer
+        totalDealerValue =
+            calculateBestHand(dealerValue1 + dealerValue2, dealerAceCount);
+        printf("Dealer's Hand : %s,Hidden(%d)\n", dealerType1, dealerValue1);
+
+        // Player places a bet
+        printf("You have $%d. Place your bet: ", playerMoney.balance);
+        scanf("%d", &playerMoney.bid);
+        while (playerMoney.bid > playerMoney.balance || playerMoney.bid <= 0) {
+          printf("Invalid bet. Please bet again: ");
+          scanf("%d", &playerMoney.bid);
+        }
+
+        int playerBusted = 0;
+        while (1) {
+          printf("***********************\n");
+          printf("1. Hit 2. Stay\n");
+          printf("Input your choice: ");
+          scanf("%d", &choice);
+          printf("***********************\n");
+
+          if (choice == 2) { // Player chooses to Stay
+            break;
+          } else if (choice == 1) { // Player chooses to Hit
+            int newCard = randomNumber(1, 13);
+            char newCardType[10];
+            int newCardValue;
+            showCard(newCard, newCardType, &newCardValue, &playerAceCount);
+            printf("Player's Hand (New Card): %s(%d)\n", newCardType,
+                   newCardValue);
+
+            totalValue =
+                calculateBestHand(totalValue + newCardValue, playerAceCount);
+            printf("Player's Hand: %d\n", totalValue);
+
+            if (totalValue > 21) {
+              printf("Bust! You went over 21\n");
+              printf("***********************\n");
+              playerBusted = 1;
+              break;
+            }
+          }
+        }
+
+        if (playerBusted == 0) {
+          // Dealer Logic
+          dealerLogic(totalValue, totalDealerValue, &playerMoney, dealerCard3,
+                      dealerCard4, dealerType1, dealerType2, dealerType3,
+                      dealerType4, dealerValue1, dealerValue2, &dealerValue3,
+                      &dealerValue4, &dealerAceCount);
+        }
+        // Check if player wants to continue or exit based on balance
+        if (playerMoney.balance <= 0) {
+          printf("You're out of money! Game over.\n");
+          break;
+        }
+      }
+      goto restart_game;
+    }
+  }
+
+  ////////////////////////Functions////////////////////////////////
+
+  int randomNumber(int min, int max) {
+    return min + rand() % (max - min + 1); // Limit the random
+  }
+
+  // Card Types and Values //
+  void showCard(int randomCard, char *cardType, int *cardValue, int *isAce) {
+    char *cardTypes[] = {"Ace",  "Two",   "Three", "Four", "Five",
+                         "Six",  "Seven", "Eight", "Nine", "Ten",
+                         "Jack", "Queen", "King"};
+    sprintf(cardType, "%s", cardTypes[randomCard - 1]);
+    *cardValue = (randomCard > 10) ? 10 : randomCard;
+    *isAce = (randomCard == 1);
+  }
+
+  // Game logic //
+  void gameLogic(int totalValue, int totalDealerValue, PlayerMoney *playerMoney) {
+
+    if (totalDealerValue > 21) {
+      printf("Dealer Bust, Player Win\n");
+      playerMoney->balance += playerMoney->bid;
+    } else if (totalValue > totalDealerValue) {
+      printf("Player Won\n");
+      playerMoney->balance += playerMoney->bid;
+    } else if (totalValue < totalDealerValue) {
+      printf("Dealer Won\n");
+      playerMoney->balance -= playerMoney->bid;
+    } else if (totalValue == totalDealerValue) {
+      printf("Push\n");
+      // No change in balance on a push
+    }
+  }
+  // Dealer Logic //
+  void dealerLogic(int totalValue, int totalDealerValue, PlayerMoney *playerMoney,
+                   int dealerCard3, int dealerCard4, char *dealerType1,
+                   char *dealerType2, char *dealerType3, char *dealerType4,
+                   int dealerValue1, int dealerValue2, int *dealerValue3,
+                   int *dealerValue4, int *dealerAceCount) {
+
+    if (totalDealerValue <= 16) {
+      printf("Dealer Hitting...\n");
+      showCard(dealerCard3, dealerType3, dealerValue3, dealerAceCount);
+      totalDealerValue = calculateBestHand(
+          dealerValue1 + dealerValue2 + *dealerValue3, *dealerAceCount);
+      printf("Dealer's Hand : %s,%s,%s(%d)\n", dealerType1, dealerType2,
+             dealerType3, totalDealerValue);
+    }
+
+    // Bust Mechanic
+    if (totalDealerValue > 21) {
+      printf("Dealer Bust, Player Win\n");
+      printf("***********************\n");
+    }
+    if (totalDealerValue <= 16) {
+      printf("Dealer Hitting...\n");
+      showCard(dealerCard4, dealerType4, dealerValue4, dealerAceCount);
+      totalDealerValue = calculateBestHand(dealerValue1 + dealerValue2 +
+                                               *dealerValue3 + *dealerValue4,
+                                           *dealerAceCount);
+      printf("Dealer's Hand : %s,%s,%s,%s(%d)\n", dealerType1, dealerType2,
+             dealerType3, dealerType4, totalDealerValue);
+    }
+
+    gameLogic(totalValue, totalDealerValue, playerMoney);
+    printf("***********************\n");
+  }
+  int calculateBestHand(int totalValue, int aceCount) {
+    while (aceCount > 0 && totalValue + 10 <= 21) {
+      totalValue += 10; // Consider Ace as 11 instead of 1
+      aceCount--;
+    }
+    return totalValue;
+  }
